@@ -1,21 +1,24 @@
-# render.yaml — TK Studio (Webstudio fork) Blueprint
+# render.yaml — TK Studio (Webstudio fork) — reference service spec.
 # Deploys the @webstudio-is/builder Remix app as a single Render Web Service.
 #
-# Apply this Blueprint from the Render dashboard:
-#   New + > Blueprint > connect RellG/tk-webstudio > select branch `main`.
-# Render reads this file and provisions the service below.
+# NOTE: the live service `tk-studio-va` (srv-d88bjm67r5hc73fgb9g0, Virginia)
+# was created directly via the Render API, not from this Blueprint. This file
+# is kept as the canonical record of build/start commands + env var shape.
+# If re-applying as a Blueprint, Render will create a new service.
 #
 # Postgres is NOT defined here — TK Studio uses an EXTERNAL managed Postgres
-# (Supabase). Supabase also provides PostgREST, which Webstudio requires.
-# All connection strings + secrets are entered as env vars in the Render
-# dashboard (sync: false keys below). NO SECRETS LIVE IN THIS FILE.
+# (Supabase, AWS us-east-2). Supabase also provides PostgREST, which Webstudio
+# requires. All connection strings + secrets are entered as env vars in the
+# Render dashboard (sync: false keys below). NO SECRETS LIVE IN THIS FILE.
 
 services:
   - type: web
-    name: tk-studio
+    name: tk-studio-va
     runtime: node
     plan: starter
-    region: oregon
+    # Virginia (us-east-1) — adjacent to the Supabase DB in AWS us-east-2,
+    # and consistent with the other TK Technology Render services.
+    region: virginia
     branch: main
     autoDeploy: true
 
