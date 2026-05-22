@@ -5,7 +5,7 @@ volumes:
 
 services:
   db:
-    image: postgres
+    image: postgres:16
     # Uncomment to log all queries
     command: ["postgres", "-c", "log_statement=all"]
     restart: always
@@ -18,3 +18,32 @@ services:
       - db:/var/lib/postgresql/data
     ports:
       - ${PGPORT:-5432}:5432
+
+  # PostgREST — Webstudio routes all user/project/asset reads & writes through it
+  # (see apps/builder/app/shared/db/*.server.ts). The Builder cannot log in without it.
+  #
+  # Local dev setup:
+  #  - The Builder sends an `anon`-role JWT (POSTGREST_API_KEY in apps/builder/.env*).
+  #  - PostgREST validates that JWT against PGRST_JWT_SECRET, then SET ROLE to the
+  #    token's `role` claim (`anon`).
+  #  - A matching `anon` DB role with full grants on `public` must exist — created
+  #    once with: CREATE ROLE anon NOLOGIN; GRANT ALL ON ALL TABLES IN SCHEMA public
+  #    TO anon; (+ sequences + default privileges). No RLS is enabled on these tables.
+  #  - PGRST_JWT_SECRET is supplied via env (see apps/builder/.env.development, which
+  #    is gitignored) so the secret is not committed. The secret + the anon JWT in
+  #    POSTGREST_API_KEY are a matched pair — regenerate both together if rotating.
+  #
+  # Do NOT use this `anon`-has-everything config in prod — use scoped roles + RLS.
+  postgrest:
+    image: postgrest/postgrest:v12.2.3
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PGRST_DB_URI: postgresql://user:pass@db:5432/webstudio
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${PGRST_JWT_SECRET}
+    ports:
+      # 3000 is taken by CyphorLog Platform on this host — use 3001.
+      - ${POSTGREST_PORT:-3001}:3000
