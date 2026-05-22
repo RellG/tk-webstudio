@@ -11,6 +11,7 @@ import interFont from "@fontsource-variable/inter/index.css?url";
 import manropeVariableFont from "@fontsource-variable/manrope/index.css?url";
 import robotoMonoFont from "@fontsource/roboto-mono/index.css?url";
 import appCss from "../shared/app.css?url";
+import tkOverridesCss from "../shared/tk-overrides.css?url";
 import {
   json,
   type LinksFunction,
@@ -36,6 +37,9 @@ export const links: LinksFunction = () => {
     { rel: "stylesheet", href: manropeVariableFont },
     { rel: "stylesheet", href: robotoMonoFont },
     { rel: "stylesheet", href: appCss },
+    // TK Studio branding overrides — must cascade after appCss.
+    { rel: "stylesheet", href: tkOverridesCss },
+    { rel: "icon", type: "image/png", href: "/tk-favicon.png" },
   ];
 };
 
@@ -45,6 +49,7 @@ const Document = (props: { children: React.ReactNode }) => {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>TK Studio</title>
         <Meta />
         <Links />
       </head>

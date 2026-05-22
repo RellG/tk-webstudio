@@ -1,0 +1,89 @@
+/* ================================================================
+   TK STUDIO — Branding overrides for the Webstudio Builder
+   ----------------------------------------------------------------
+   Single-file shim. Linked last in _ui.tsx so it cascades over the
+   Stitches-generated theme. DO NOT edit Webstudio component source
+   for branding — keep all token overrides here.
+
+   Tokens reference: TkTechnology/design-tools/TK-Technology-Design-System/
+     navy bg #0a0f14 · brushed-blue accent #4a9ece · accent-muted #2d7ab3
+   ================================================================ */
+
+:root {
+  /* TK brand palette (mirrors colors_and_type.css) */
+  --tk-navy-950: #0a0f14;
+  --tk-navy-900: #0d1520;
+  --tk-navy-800: #0e3e62;
+  --tk-navy-700: #1a5a8a;
+  --tk-accent-muted: #2d7ab3;
+  --tk-accent: #4a9ece;
+  --tk-fg-1: #e8e7ec;
+  --tk-fg-2: rgba(200, 200, 210, 0.75);
+}
+
+/* ----------------------------------------------------------------
+   1. Primary accent — retarget Webstudio's #096cff blue to TK
+      brushed-blue. The Builder chrome is already a light theme with
+      a blue accent, so this is a low-risk swap that does not touch
+      panel-background contrast.
+   ---------------------------------------------------------------- */
+:root,
+.w-theme {
+  --colors-backgroundPrimary: var(--tk-accent);
+  --colors-backgroundPrimaryLight: var(--tk-accent);
+  --colors-borderFocus: var(--tk-accent);
+  --colors-foregroundLink: var(--tk-accent-muted);
+  --colors-foregroundLinkHover: var(--tk-accent);
+
+  /* Brand spinners / CTA — retarget purple/pink/turquoise to TK blue */
+  --colors-brandSpinnerBlue: var(--tk-accent);
+  --colors-brandSpinnerPurple: var(--tk-accent-muted);
+  --colors-brandSpinnerTurquoise: var(--tk-accent);
+  --colors-brandBackgroundCtaButton: linear-gradient(
+    135deg,
+    var(--tk-accent) 0%,
+    var(--tk-accent-muted) 100%
+  );
+}
+
+/* ----------------------------------------------------------------
+   2. Login entry surface — the brand-facing front door.
+      Webstudio paints the colorful radial-gradient backdrop via a
+      Stitches-generated class on the flex container that wraps the
+      login card. Stitches injects its theme <style> at runtime,
+      after this static <link>, so a plain --colors-* override loses
+      on source order. We instead repaint the wrapper directly.
+      `:has()` scopes this to the login wrapper only (the element
+      that contains the TK login card), leaving the dashboard
+      untouched.
+   ---------------------------------------------------------------- */
+body > div:has(> [data-tk-login-card]) {
+  background: var(--tk-navy-950) !important;
+}
+
+/* TK login card: the Webstudio login renders a translucent white card
+   on a colorful gradient. On the TK navy field a translucent-white
+   card kills contrast — give it a navy glass surface instead. */
+[data-tk-login-card] {
+  background-color: rgba(14, 62, 98, 0.35) !important;
+  border: 1px solid rgba(74, 158, 206, 0.3);
+  backdrop-filter: blur(12px);
+}
+
+[data-tk-login-card] h1,
+[data-tk-login-card] [class*="brandSectionTitle"] {
+  color: var(--tk-fg-1);
+  background: linear-gradient(135deg, #e8e7ec, #4a9ece);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* TK logo on the login card — constrain like the marketing nav logo */
+[data-tk-login-logo] {
+  height: 48px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  display: block;
+}

@@ -28,7 +28,7 @@ export const links: LinksFunction = () => {
   return [
     {
       rel: "canonical",
-      href: "https://apps.webstudio.is/login",
+      href: "https://studio.tktechnology.org/login",
     },
   ];
 };
@@ -37,16 +37,16 @@ export const meta: MetaFunction<typeof loader> = () => {
   const metas: ReturnType<MetaFunction> = [
     {
       name: "title",
-      content: "Webstudio Login",
+      content: "Sign in to TK Studio",
     },
     {
       name: "description",
-      content: "Log in to Webstudio to start creating websites.",
+      content: "Sign in to TK Studio to customize and publish your website.",
     },
     { name: "robots", content: "index, follow" },
   ];
 
-  metas.push({ title: "Webstudio Login" });
+  metas.push({ title: "Sign in to TK Studio" });
 
   return metas;
 };

@@ -6,7 +6,7 @@ export { ErrorBoundary } from "~/shared/error/error-boundary";
 export const meta = () => {
   const metas: ReturnType<MetaFunction> = [];
 
-  metas.push({ title: "Webstudio Dashboard | Search" });
+  metas.push({ title: "TK Studio | Search" });
 
   return metas;
 };

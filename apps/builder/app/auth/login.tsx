@@ -7,7 +7,7 @@ import {
   Text,
   theme,
 } from "@webstudio-is/design-system";
-import { GithubIcon, GoogleIcon, WebstudioIcon } from "@webstudio-is/icons";
+import { GithubIcon, GoogleIcon } from "@webstudio-is/icons";
 import { Form } from "@remix-run/react";
 import { authPath } from "~/shared/router-utils";
 import { SecretLogin } from "./secret-login";
@@ -45,6 +45,7 @@ export const Login = ({
       }}
     >
       <Flex
+        data-tk-login-card
         direction="column"
         align="center"
         gap="6"
@@ -58,9 +59,15 @@ export const Login = ({
           },
         }}
       >
-        <WebstudioIcon size={48} />
+        <img
+          data-tk-login-logo
+          src="/tk-logo-light.png"
+          alt="TK Studio"
+          width={220}
+          height={66}
+        />
         <Text variant="brandSectionTitle" as="h1" align="center">
-          Welcome to Webstudio
+          Sign in to TK Studio
         </Text>
 
         <TooltipProvider>

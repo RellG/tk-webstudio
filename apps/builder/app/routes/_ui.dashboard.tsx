@@ -37,7 +37,7 @@ import type { DashboardData } from "~/dashboard/shared/types";
 export const meta = () => {
   const metas: ReturnType<MetaFunction> = [];
 
-  metas.push({ title: "Webstudio Dashboard | Projects" });
+  metas.push({ title: "TK Studio | Projects" });
 
   return metas;
 };
