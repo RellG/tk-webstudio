@@ -40,8 +40,11 @@ services:
     # remix-serve honors $PORT (Render injects it automatically).
     startCommand: pnpm --filter=@webstudio-is/builder start
 
-    # Webstudio Builder serves a 200 at the app root once booted.
-    healthCheckPath: /
+    # Health check hits /robots.txt — a static file served directly by
+    # remix-serve (200, no route loader). The app root `/` cannot be used:
+    # Webstudio's preventCrossOriginCookie guard 403s any request without
+    # sec-fetch-* headers, which Render's health checker (Render/1.0) omits.
+    healthCheckPath: /robots.txt
 
     envVars:
       # --- Runtime pins ---------------------------------------------------
