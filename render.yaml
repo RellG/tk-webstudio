@@ -37,11 +37,14 @@ services:
       pnpm --filter=@webstudio-is/prisma-client generate &&
       pnpm build
 
-    # remix-serve honors $PORT (Render injects it automatically).
-    startCommand: pnpm --filter=@webstudio-is/builder start
+    # Custom server (apps/builder/server.mjs) instead of `remix-serve`: it
+    # adds `trust proxy` so request.url is https:// behind Render/Cloudflare.
+    # Stock remix-serve reports http://, which breaks the builder OAuth flow.
+    # The server honors $PORT (Render injects it automatically).
+    startCommand: node apps/builder/server.mjs
 
     # Health check hits /robots.txt — a static file served directly by
-    # remix-serve (200, no route loader). The app root `/` cannot be used:
+    # the server (200, no route loader). The app root `/` cannot be used:
     # Webstudio's preventCrossOriginCookie guard 403s any request without
     # sec-fetch-* headers, which Render's health checker (Render/1.0) omits.
     healthCheckPath: /robots.txt
