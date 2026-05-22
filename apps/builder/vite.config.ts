@@ -41,7 +41,11 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       remix({
-        presets: [vercelPreset()],
+        // TK Studio: Webstudio deploys to Vercel, where vercelPreset() nests
+        // the server build under build/server/nodejs-<runtime>/index.js. We
+        // self-host on Render (plain Node), where `remix-serve` expects the
+        // standard build/server/index.js. Apply the preset only on Vercel.
+        presets: process.env.VERCEL ? [vercelPreset()] : [],
         future: {
           v3_lazyRouteDiscovery: false,
           v3_relativeSplatPath: false,
