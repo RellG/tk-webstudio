@@ -22,9 +22,14 @@ services:
     # Monorepo: install + build from the repo root so pnpm workspace resolves,
     # then the Builder app is built via the root `build` script chain.
     # corepack activates the pinned pnpm (9.14.4) declared in package.json.
+    #
+    # --prod=false is REQUIRED: NODE_ENV=production (set below) makes pnpm skip
+    # devDependencies, but Webstudio keeps its build tooling (prisma, esbuild,
+    # vite, typescript) in devDependencies. Without this flag the build fails
+    # with `prisma: not found`. Runtime NODE_ENV=production is unaffected.
     buildCommand: >-
       corepack enable &&
-      pnpm install --frozen-lockfile &&
+      pnpm install --frozen-lockfile --prod=false &&
       pnpm --filter=@webstudio-is/prisma-client generate &&
       pnpm --filter=@webstudio-is/builder build
 
