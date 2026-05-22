@@ -47,6 +47,8 @@ Before building anything, confirm how Webstudio represents "a template" vs "a pr
 
 **Deliverable:** a short addendum to this doc — `Phase 4.0 findings` — with the chosen clone mechanism + the route/handler we'll add for `?template={slug}`.
 
+**Status:** COMPLETE — see PHASE_4_0_FINDINGS.md
+
 ### Phase 4.1 — First template, end to end (3–5 days)
 
 Pick **one** of the 25 templates that is visually representative but not the hardest (recommended: **runway** or **stillwater** — clean structure, well-scoped). Rebuild it as a native Webstudio project, then wire the `?template=runway` deep-link flow to clone it for a new user.
