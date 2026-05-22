@@ -19,19 +19,23 @@ services:
     branch: main
     autoDeploy: true
 
-    # Monorepo: install + build from the repo root so pnpm workspace resolves,
-    # then the Builder app is built via the root `build` script chain.
+    # Monorepo: install + build from the repo root so pnpm workspace resolves.
     # corepack activates the pinned pnpm (9.14.4) declared in package.json.
     #
     # --prod=false is REQUIRED: NODE_ENV=production (set below) makes pnpm skip
     # devDependencies, but Webstudio keeps its build tooling (prisma, esbuild,
     # vite, typescript) in devDependencies. Without this flag the build fails
     # with `prisma: not found`. Runtime NODE_ENV=production is unaffected.
+    #
+    # `pnpm build` (root script: `pnpm -r --filter='!./fixtures/*' build`)
+    # builds ALL workspace packages in topological order. Building only the
+    # builder app fails — its ~40 internal deps (e.g. @webstudio-is/http-client)
+    # resolve `import` to a `lib/` dir that doesn't exist until they're built.
     buildCommand: >-
       corepack enable &&
       pnpm install --frozen-lockfile --prod=false &&
       pnpm --filter=@webstudio-is/prisma-client generate &&
-      pnpm --filter=@webstudio-is/builder build
+      pnpm build
 
     # remix-serve honors $PORT (Render injects it automatically).
     startCommand: pnpm --filter=@webstudio-is/builder start
