@@ -1,0 +1,19 @@
+{
+  "name": "@tk/tk-templates",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsx build.tsx"
+  },
+  "dependencies": {
+    "@webstudio-is/sdk": "workspace:*",
+    "@webstudio-is/template": "workspace:*",
+    "nanoid": "^5.1.5",
+    "react": "18.3.0-canary-14898b6a9-20240318"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.3",
+    "@types/node": "^22.7.0"
+  }
+}

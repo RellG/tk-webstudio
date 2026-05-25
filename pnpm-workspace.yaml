@@ -2,3 +2,4 @@ packages:
   - "packages/*"
   - "apps/*"
   - "fixtures/*"
+  - "scripts/tk-templates"
