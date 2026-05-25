@@ -33,6 +33,7 @@ import { createContext } from "~/shared/context.server";
 import { isDowngradedForMember } from "~/dashboard/workspace/utils";
 import { loadWorkspacesForDashboard } from "~/dashboard/workspace/loader.server";
 import type { DashboardData } from "~/dashboard/shared/types";
+import { getTKTemplate } from "~/tk-templates";
 
 export const meta = () => {
   const metas: ReturnType<MetaFunction> = [];
@@ -165,6 +166,43 @@ const getProjectToClone = async (request: Request, context: AppContext) => {
   };
 };
 
+// TK Studio deep-link: marketing-site templates.html links to
+// `?template=<slug>` to seed a fresh project from a TK template. The slug
+// maps to a real Webstudio project (owned by tk-system) via TK_TEMPLATES;
+// from there the existing clone dialog handles the rest.
+const getTKTemplateToClone = async (request: Request, context: AppContext) => {
+  const url = new URL(request.url);
+  const templateSlug = url.searchParams.get("template");
+
+  if (
+    request.headers.get("sec-fetch-mode") !== "navigate" ||
+    templateSlug === null
+  ) {
+    return;
+  }
+
+  const template = getTKTemplate(templateSlug);
+  if (template === undefined) {
+    return;
+  }
+
+  const token = await authDb.getTokenInfo(template.authToken, context);
+  if (token.canClone === false) {
+    throw new AuthorizationError("You don't have access to clone this project");
+  }
+
+  const project = await projectApi.loadById(
+    token.projectId,
+    await context.createTokenContext(template.authToken)
+  );
+
+  return {
+    id: token.projectId,
+    authToken: template.authToken,
+    title: project.title,
+  };
+};
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   // CSRF token checks are not necessary for dashboard-only pages.
   // All requests from the builder or canvas app are safeguarded either by preventCrossOriginCookie for fetch requests
@@ -185,7 +223,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     notifications,
   } = await loadDashboardData(request);
 
-  const projectToClone = await getProjectToClone(request, context);
+  const projectToClone =
+    (await getProjectToClone(request, context)) ??
+    (await getTKTemplateToClone(request, context));
 
   return json(
     {
