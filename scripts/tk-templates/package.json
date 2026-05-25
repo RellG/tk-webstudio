@@ -4,9 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsx build.tsx"
+    "tk:build": "NODE_OPTIONS='--conditions=webstudio' tsx build.tsx",
+    "tk:provision": "NODE_OPTIONS='--conditions=webstudio' tsx provision-template.tsx"
   },
   "dependencies": {
+    "@webstudio-is/prisma-client": "workspace:*",
     "@webstudio-is/sdk": "workspace:*",
     "@webstudio-is/template": "workspace:*",
     "nanoid": "^5.1.5",
