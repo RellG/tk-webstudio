@@ -22,7 +22,9 @@
 import { readFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { prisma } from "@webstudio-is/prisma-client";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

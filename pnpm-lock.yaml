@@ -2428,6 +2428,9 @@ importers:
 
   scripts/tk-templates:
     dependencies:
+      '@prisma/client':
+        specifier: 5.12.1
+        version: 5.12.1(prisma@5.12.1)
       '@webstudio-is/prisma-client':
         specifier: workspace:*
         version: link:../../packages/prisma-client

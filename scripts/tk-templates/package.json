@@ -8,6 +8,7 @@
     "tk:provision": "NODE_OPTIONS='--conditions=webstudio' tsx provision-template.tsx"
   },
   "dependencies": {
+    "@prisma/client": "5.12.1",
     "@webstudio-is/prisma-client": "workspace:*",
     "@webstudio-is/sdk": "workspace:*",
     "@webstudio-is/template": "workspace:*",
