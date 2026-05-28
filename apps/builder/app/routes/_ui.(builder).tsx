@@ -65,7 +65,11 @@ export const loader = async (loaderArgs: LoaderFunctionArgs) => {
   allowedDestinations(request, ["document", "empty"]);
 
   if (isDashboard(request)) {
-    throw redirect(dashboardPath());
+    // Preserve the query string so deep-links like `/?template=runway`
+    // survive the redirect to the dashboard, where the TK template clone
+    // flow reads `?template=<slug>` (see _ui.dashboard.tsx).
+    const url = new URL(request.url);
+    throw redirect(`${dashboardPath()}${url.search}`);
   }
 
   if (false === isBuilder(request)) {
