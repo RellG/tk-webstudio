@@ -23,7 +23,11 @@ export type TKTemplate = {
 };
 
 export const TK_TEMPLATES: Record<string, TKTemplate> = {
-  // runway: { projectId: "TBD", authToken: "TBD", title: "Runway" },
+  runway: {
+    projectId: "2d47030c-be3b-4cbb-8ab1-bb6d4fcc159a",
+    authToken: "9d7cdb4d-b918-4497-ac0d-2894d807a06e",
+    title: "Runway",
+  },
 };
 
 export const getTKTemplate = (slug: string): TKTemplate | undefined => {
