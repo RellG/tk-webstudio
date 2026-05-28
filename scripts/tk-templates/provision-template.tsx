@@ -22,11 +22,22 @@
 import { readFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { createRequire } from "node:module";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Webstudio generates the Prisma client as CommonJS into
+// packages/prisma-client/src/__generated__ (custom output location, not the
+// default @prisma/client). The workspace's prisma.mjs re-exports from a
+// ./lib/ build dir that's never compiled for standalone use, so we load the
+// generated CJS client directly. The relative path is identical on vbox and
+// on Render (/opt/render/project/src/...).
+const require = createRequire(import.meta.url);
+const { PrismaClient } = require(
+  join(__dirname, "../../packages/prisma-client/src/__generated__/index.js")
+) as { PrismaClient: new () => any };
+
+const prisma = new PrismaClient();
 
 const TK_SYSTEM_EMAIL =
   process.env.TK_SYSTEM_EMAIL ?? "tk-system@tktechnology.org";
