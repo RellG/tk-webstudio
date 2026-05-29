@@ -109,21 +109,43 @@ const main = async () => {
     ]),
   };
 
-  const fullData = { ...data, pages };
+  // Serialize each column EXACTLY as Webstudio's createBuild does
+  // (packages/project-build/src/db/build.ts): every data column is
+  // `JSON.stringify(Array.from(map.values()))` — a flat array of objects,
+  // NOT [key, value] entry tuples. The builder's parseCompactBuild reads
+  // them back with `JSON.parse(col) as Item[]`, so an entry-tuple shape
+  // makes the builder crash ("Cannot read properties of undefined").
+  const serializeValues = (map: Map<unknown, unknown>) =>
+    JSON.stringify(Array.from(map.values()));
 
-  const serializable = JSON.parse(
-    JSON.stringify(fullData, (_key, value) => {
-      if (value instanceof Map) {
-        return Array.from(value.entries());
-      }
-      return value;
-    })
-  );
+  // pages mirrors serializePages() output (homePageId + flat Page[]/Folder[]),
+  // which migratePages() recognizes via isSerializedPages().
+  const serializedPages = JSON.stringify({
+    meta: pages.meta,
+    compiler: pages.compiler,
+    redirects: pages.redirects,
+    homePageId: pages.homePageId,
+    rootFolderId: pages.rootFolderId,
+    pages: Array.from(pages.pages.values()),
+    folders: Array.from(pages.folders.values()),
+  });
+
+  const columns = {
+    pages: serializedPages,
+    breakpoints: serializeValues(data.breakpoints),
+    styles: serializeValues(data.styles),
+    styleSources: serializeValues(data.styleSources),
+    styleSourceSelections: serializeValues(data.styleSourceSelections),
+    props: serializeValues(data.props),
+    dataSources: serializeValues(data.dataSources),
+    resources: serializeValues(data.resources),
+    instances: serializeValues(data.instances),
+  };
 
   const outDir = join(__dirname, "out");
   await mkdir(outDir, { recursive: true });
   const outPath = join(outDir, `${slug}.json`);
-  await writeFile(outPath, JSON.stringify(serializable, null, 2));
+  await writeFile(outPath, JSON.stringify(columns, null, 2));
 
   const counts = {
     instances: data.instances.size,

@@ -43,23 +43,19 @@ const TK_SYSTEM_EMAIL =
   process.env.TK_SYSTEM_EMAIL ?? "tk-system@tktechnology.org";
 const TK_SYSTEM_USERNAME = process.env.TK_SYSTEM_USERNAME ?? "tk-system";
 
-type Tuple = [string, unknown];
-type WebstudioJson = {
-  instances: Tuple[];
-  props: Tuple[];
-  styles: Tuple[];
-  styleSources: Tuple[];
-  styleSourceSelections: Tuple[];
-  dataSources: Tuple[];
-  resources: Tuple[];
-  breakpoints: Tuple[];
-  assets: Tuple[];
-  pages: {
-    homePageId: string;
-    rootFolderId: string;
-    pages: Tuple[];
-    folders: Tuple[];
-  };
+// build.tsx already emits each value as the final, ready-to-store column
+// string (JSON.stringify of a flat array / serialized pages object), exactly
+// matching Webstudio's createBuild. We store them verbatim — no re-shaping.
+type WebstudioColumns = {
+  instances: string;
+  props: string;
+  styles: string;
+  styleSources: string;
+  styleSourceSelections: string;
+  dataSources: string;
+  resources: string;
+  breakpoints: string;
+  pages: string;
 };
 
 const ensureSystemUser = async () => {
@@ -82,7 +78,9 @@ const ensureSystemUser = async () => {
 
 const provision = async (slug: string) => {
   const outPath = join(__dirname, "out", `${slug}.json`);
-  const json = JSON.parse(await readFile(outPath, "utf8")) as WebstudioJson;
+  const columns = JSON.parse(
+    await readFile(outPath, "utf8")
+  ) as WebstudioColumns;
 
   const user = await ensureSystemUser();
   const domain = `tk-template-${slug}`;
@@ -109,32 +107,22 @@ const provision = async (slug: string) => {
     console.log(`reusing project: ${project.id}`);
   }
 
-  // Replace Build. Webstudio stores each WebstudioData segment as a
-  // JSON-serialized array-of-tuples (the Map's [key, value] entries).
+  // Replace Build. Each column is already the exact JSON string Webstudio
+  // expects (produced by build.tsx) — store verbatim.
   await prisma.build.deleteMany({ where: { projectId: project.id } });
-
-  const pagesPayload = {
-    homePage: pageFromTuple(
-      json.pages.pages.find(([id]) => id === json.pages.homePageId)
-    ),
-    pages: json.pages.pages
-      .filter(([id]) => id !== json.pages.homePageId)
-      .map(([, page]) => page),
-    folders: json.pages.folders.map(([, folder]) => folder),
-  };
 
   await prisma.build.create({
     data: {
       projectId: project.id,
-      pages: JSON.stringify(pagesPayload),
-      breakpoints: JSON.stringify(json.breakpoints),
-      styles: JSON.stringify(json.styles),
-      styleSources: JSON.stringify(json.styleSources),
-      styleSourceSelections: JSON.stringify(json.styleSourceSelections),
-      props: JSON.stringify(json.props),
-      dataSources: JSON.stringify(json.dataSources),
-      resources: JSON.stringify(json.resources),
-      instances: JSON.stringify(json.instances),
+      pages: columns.pages,
+      breakpoints: columns.breakpoints,
+      styles: columns.styles,
+      styleSources: columns.styleSources,
+      styleSourceSelections: columns.styleSourceSelections,
+      props: columns.props,
+      dataSources: columns.dataSources,
+      resources: columns.resources,
+      instances: columns.instances,
     },
   });
 
@@ -167,13 +155,6 @@ const provision = async (slug: string) => {
   console.log(
     `  ${slug}: { projectId: "${project.id}", authToken: "${token.token}", title: "${project.title}" },`
   );
-};
-
-const pageFromTuple = (entry: Tuple | undefined) => {
-  if (entry === undefined) {
-    throw new Error("home page tuple missing from json.pages.pages");
-  }
-  return entry[1];
 };
 
 const titleCase = (slug: string) =>
